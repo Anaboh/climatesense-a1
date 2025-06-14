@@ -4,7 +4,7 @@ import asyncio
 import aiohttp
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from bs4 import BeautifulSoup
-from deepseek import DeepSeek
+from deepseek import DeepSeekAPI  # Corrected import
 import pdfplumber
 from io import BytesIO
 import json
@@ -15,7 +15,7 @@ from typing import List, Dict
 app = FastAPI(title="ClimateSense AI", version="1.0.0")
 
 # Initialize DeepSeek client
-client = DeepSeek(api_key=os.getenv("DEEPSEEK_API_KEY"))
+client = DeepSeekAPI(api_key=os.getenv("DEEPSEEK_API_KEY"))  # Corrected initialization
 
 # In-memory storage for demo (use database in production)
 reports_store = []
@@ -36,11 +36,16 @@ async def fetch_pdf(url: str):
 
 def extract_text_from_pdf(pdf_bytes: bytes, max_pages: int = 20) -> str:
     text = ""
-    with pdfplumber.open(BytesIO(pdf_bytes)) as pdf:
-        for i, page in enumerate(pdf.pages):
-            if i >= max_pages:  # Limit pages for demo
-                break
-            text += page.extract_text() + "\n\n"
+    try:
+        with pdfplumber.open(BytesIO(pdf_bytes)) as pdf:
+            for i, page in enumerate(pdf.pages):
+                if i >= max_pages:  # Limit pages for demo
+                    break
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n\n"
+    except Exception as e:
+        print(f"PDF extraction error: {str(e)}")
     return text
 
 def clean_text(text: str) -> str:
@@ -76,7 +81,12 @@ async def process_ipcc_report(report_url: str):
         soup = BeautifulSoup(report_html, 'html.parser')
         
         # Extract report details
-        title = soup.select_one('h1.page-header__title').text.strip()
+        title = soup.select_one('h1.page-header__title')
+        if not title:
+            print(f"No title found for {report_url}")
+            return None
+            
+        title = title.text.strip()
         date_tag = soup.select_one('.date--publication meta')
         date = date_tag['content'] if date_tag else datetime.now().strftime("%Y-%m-%d")
         
@@ -127,9 +137,11 @@ async def scrape_ipcc_reports(limit: int = 5):
         # Get report links
         report_links = []
         for card in soup.select('.card-item__content'):
-            link = card.select_one('.card-item__link')['href']
-            full_url = f"{base_url}{link}" if link.startswith('/') else link
-            report_links.append(full_url)
+            link = card.select_one('.card-item__link')
+            if link and link.has_attr('href'):
+                href = link['href']
+                full_url = f"{base_url}{href}" if href.startswith('/') else href
+                report_links.append(full_url)
         
         # Process reports concurrently
         tasks = [process_ipcc_report(url) for url in report_links[:limit]]
