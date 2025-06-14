@@ -7,6 +7,7 @@ RUN apt-get update && \
     apt-get clean
 
 COPY requirements.txt .
+RUN apt-get update && apt-get install -y libpoppler-cpp-dev pkg-config
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
