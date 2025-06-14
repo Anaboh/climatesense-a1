@@ -4,7 +4,7 @@ import asyncio
 import aiohttp
 import logging
 from fastapi import FastAPI, BackgroundTasks, HTTPException, Request
-from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from bs4 import BeautifulSoup
@@ -14,6 +14,7 @@ import json
 from datetime import datetime
 import hashlib
 from typing import List, Dict
+from pathlib import Path
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -21,10 +22,25 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="ClimateSense AI", version="1.0.0")
 
+# Get current directory
+BASE_DIR = Path(__file__).resolve().parent
+
+# Define absolute paths for static and templates
+STATIC_DIR = BASE_DIR / "static"
+TEMPLATES_DIR = BASE_DIR / "templates"
+
+# Create directories if they don't exist
+os.makedirs(STATIC_DIR, exist_ok=True)
+os.makedirs(TEMPLATES_DIR, exist_ok=True)
+
+logger.info(f"Base directory: {BASE_DIR}")
+logger.info(f"Static directory: {STATIC_DIR} (exists: {STATIC_DIR.exists()})")
+logger.info(f"Templates directory: {TEMPLATES_DIR} (exists: {TEMPLATES_DIR.exists()})")
+
 # Mount static files and templates
 try:
-    app.mount("/static", StaticFiles(directory="static"), name="static")
-    templates = Jinja2Templates(directory="templates")
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+    templates = Jinja2Templates(directory=TEMPLATES_DIR)
     logger.info("Static files and templates mounted successfully")
 except Exception as e:
     logger.error(f"Error mounting static/templates: {str(e)}")
@@ -303,6 +319,16 @@ async def report_data(report_id: str):
 @app.get("/health")
 async def health_check():
     return {"status": "ok", "timestamp": datetime.now().isoformat()}
+
+@app.get("/debug/dirs")
+async def debug_dirs():
+    return {
+        "base_dir": str(BASE_DIR),
+        "static_exists": STATIC_DIR.exists(),
+        "static_files": [str(f) for f in STATIC_DIR.glob("*")],
+        "templates_exists": TEMPLATES_DIR.exists(),
+        "template_files": [str(f) for f in TEMPLATES_DIR.glob("*")]
+    }
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
