@@ -3,11 +3,10 @@ FROM python:3.11-slim
 WORKDIR /app
 
 RUN apt-get update && \
-    apt-get install -y gcc libpoppler-cpp-dev pkg-config && \
+    apt-get install -y gcc libpoppler-cpp-dev pkg-config poppler-utils && \
     apt-get clean
 
 COPY requirements.txt .
-RUN apt-get update && apt-get install -y libpoppler-cpp-dev pkg-config
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
