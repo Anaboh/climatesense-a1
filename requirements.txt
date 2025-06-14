@@ -2,7 +2,7 @@ fastapi==0.110.0
 uvicorn==0.29.0
 beautifulsoup4==4.12.3
 requests==2.31.0
-deepseek==0.0.12  # Corrected package name and version
+deepseek-sdk==0.1.0  # Correct package name and version
 pdfplumber==0.10.3
 python-dotenv==1.0.1
 aiohttp==3.9.5
