@@ -2,7 +2,10 @@ import os
 import re
 import asyncio
 import aiohttp
-from fastapi import FastAPI, BackgroundTasks, HTTPException
+from fastapi import FastAPI, BackgroundTasks, HTTPException, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from bs4 import BeautifulSoup
 import pdfplumber
 from io import BytesIO
@@ -12,6 +15,10 @@ import hashlib
 from typing import List, Dict
 
 app = FastAPI(title="ClimateSense AI", version="1.0.0")
+
+# Mount static files and templates
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
 # In-memory storage for demo
 reports_store = []
@@ -192,15 +199,27 @@ async def start_scrape(background_tasks: BackgroundTasks):
         "message": "Scraping started in background. Check /reports endpoint in a few minutes."
     }
 
-@app.get("/reports")
-async def list_reports():
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/reports", response_class=HTMLResponse)
+async def list_reports(request: Request):
+    return templates.TemplateResponse("reports.html", {"request": request})
+
+@app.get("/reports/data")
+async def reports_data():
     return {
         "count": len(reports_store),
         "reports": reports_store
     }
 
-@app.get("/report/{report_id}")
-async def get_report(report_id: str):
+@app.get("/report/{report_id}", response_class=HTMLResponse)
+async def get_report(request: Request, report_id: str):
+    return templates.TemplateResponse("report.html", {"request": request})
+
+@app.get("/report/{report_id}/data")
+async def report_data(report_id: str):
     report = next((r for r in reports_store if r["id"] == report_id), None)
     if not report:
         raise HTTPException(status_code=404, detail="Report not found")
@@ -209,19 +228,6 @@ async def get_report(report_id: str):
     return {
         "report": report,
         "summary": summary
-    }
-
-@app.get("/")
-async def home():
-    return {
-        "name": "ClimateSense AI",
-        "description": "IPCC Report Summarizer",
-        "endpoints": {
-            "scrape_reports": "POST /scrape",
-            "list_reports": "GET /reports",
-            "get_report": "GET /report/{id}"
-        },
-        "note": "Free tier limitations: Processes first 3 reports, 10 pages per PDF"
     }
 
 @app.get("/health")
