@@ -36,3 +36,21 @@ This application automatically scrapes IPCC climate reports, processes them, and
    After deployment, trigger scraping:
    ```bash
    curl -X POST https://your-service.onrender.com/scrape
+   ```
+
+6. **Access Reports**
+   - List reports: GET /reports
+   - Get report details: GET /report/{id}
+
+**Usage**
+   - Web Interface: https://your-service.onrender.com
+   - API Documentation: Built-in with FastAPI (add /docs to URL)
+
+**Mobile Access**
+   - The API is mobile-friendly. Use any HTTP client to access endpoints.
+
+**Note**
+   - Free tier limitations:
+   - Limited to 5 reports
+   - Processes first 20 pages of PDFs
+   - May have cold start delays
