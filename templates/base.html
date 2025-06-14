@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClimateSense AI - IPCC Report Summarizer</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/static/img/icon-192.png">
+    <meta name="theme-color" content="#2c3e50">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>ClimateSense AI</h1>
+            <p>IPCC Report Insights & Summaries</p>
+        </div>
+    </header>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Powered by DeepSeek AI • IPCC Climate Reports</p>
+            <div class="pwa-install" id="installContainer" style="display: none;">
+                <button id="installBtn">Install App</button>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/static/js/app.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
