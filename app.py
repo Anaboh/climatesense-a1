@@ -4,7 +4,6 @@ import asyncio
 import aiohttp
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from bs4 import BeautifulSoup
-from openai import AsyncOpenAI  # Use OpenAI client for DeepSeek
 import pdfplumber
 from io import BytesIO
 import json
@@ -14,15 +13,12 @@ from typing import List, Dict
 
 app = FastAPI(title="ClimateSense AI", version="1.0.0")
 
-# Initialize DeepSeek client using OpenAI SDK
-client = AsyncOpenAI(
-    api_key=os.getenv("DEEPSEEK_API_KEY"),
-    base_url="https://api.deepseek.com/v1"  # DeepSeek API endpoint
-)
-
 # In-memory storage for demo
 reports_store = []
 summaries_store = {}
+
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
+DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
 
 def get_report_hash(title: str) -> str:
     return hashlib.md5(title.encode()).hexdigest()
@@ -57,32 +53,45 @@ def clean_text(text: str) -> str:
     return text.strip()
 
 async def summarize_text(text: str, report_title: str) -> Dict:
+    headers = {
+        "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    
+    payload = {
+        "model": "deepseek-chat",
+        "messages": [
+            {
+                "role": "system",
+                "content": "You are a climate science expert summarizing IPCC reports. Return output in JSON format."
+            },
+            {
+                "role": "user",
+                "content": (
+                    f"Create a structured summary with these keys: "
+                    f"key_findings (list), risks (list), mitigation_options (list), confidence_level (string). "
+                    f"Report Title: {report_title}\n\n"
+                    f"Text: {text[:5000]}"
+                )
+            }
+        ],
+        "response_format": {"type": "json_object"},
+        "max_tokens": 1000
+    }
+    
     try:
-        # Use OpenAI-compatible API call
-        response = await client.chat.completions.create(
-            model="deepseek-chat",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are a climate science expert summarizing IPCC reports. Return output in JSON format."
-                },
-                {
-                    "role": "user",
-                    "content": (
-                        f"Create a structured summary with these keys: "
-                        f"key_findings (list), risks (list), mitigation_options (list), confidence_level (string). "
-                        f"Report Title: {report_title}\n\n"
-                        f"Text: {text[:5000]}"
-                    )
-                }
-            ],
-            response_format={"type": "json_object"},
-            max_tokens=1000
-        )
-        
-        # Extract JSON content
-        summary_str = response.choices[0].message.content
-        return json.loads(summary_str)
+        async with aiohttp.ClientSession() as session:
+            async with session.post(DEEPSEEK_API_URL, headers=headers, json=payload) as response:
+                if response.status != 200:
+                    error = await response.text()
+                    print(f"DeepSeek API error: {error}")
+                    return {
+                        "error": f"API error: {response.status}"
+                    }
+                
+                result = await response.json()
+                summary_str = result['choices'][0]['message']['content']
+                return json.loads(summary_str)
     except Exception as e:
         print(f"Summarization error: {str(e)}")
         return {
