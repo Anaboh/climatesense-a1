@@ -4,7 +4,7 @@ import asyncio
 import aiohttp
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from bs4 import BeautifulSoup
-from deepseek import DeepSeekAPI  # Corrected import
+from deepseek import DeepSeek  # Correct import for deepseek-sdk
 import pdfplumber
 from io import BytesIO
 import json
@@ -15,7 +15,7 @@ from typing import List, Dict
 app = FastAPI(title="ClimateSense AI", version="1.0.0")
 
 # Initialize DeepSeek client
-client = DeepSeekAPI(api_key=os.getenv("DEEPSEEK_API_KEY"))  # Corrected initialization
+client = DeepSeek(api_key=os.getenv("DEEPSEEK_API_KEY"))
 
 # In-memory storage for demo (use database in production)
 reports_store = []
@@ -34,12 +34,12 @@ async def fetch_pdf(url: str):
         async with session.get(url) as response:
             return await response.read()
 
-def extract_text_from_pdf(pdf_bytes: bytes, max_pages: int = 20) -> str:
+def extract_text_from_pdf(pdf_bytes: bytes, max_pages: int = 10) -> str:  # Reduced to 10 pages for free tier
     text = ""
     try:
         with pdfplumber.open(BytesIO(pdf_bytes)) as pdf:
             for i, page in enumerate(pdf.pages):
-                if i >= max_pages:  # Limit pages for demo
+                if i >= max_pages:
                     break
                 page_text = page.extract_text()
                 if page_text:
@@ -62,7 +62,7 @@ async def summarize_text(text: str, report_title: str) -> Dict:
             f"Create a structured summary of this report section in JSON format with these keys: "
             f"key_findings (list), risks (list), mitigation_options (list), confidence_level (string). "
             f"Report Title: {report_title}\n\n"
-            f"Text: {text[:10000]}"  # First 10k characters for demo
+            f"Text: {text[:5000]}"  # Reduced to 5000 characters for free tier
         )
         return json.loads(response.text)
     except Exception as e:
@@ -112,11 +112,12 @@ async def process_ipcc_report(report_url: str):
         
         # Process first PDF only for demo
         if pdf_links:
+            print(f"Downloading PDF: {pdf_links[0]}")
             pdf_bytes = await fetch_pdf(pdf_links[0])
             pdf_text = extract_text_from_pdf(pdf_bytes)
             clean_pdf_text = clean_text(pdf_text)
             
-            # Generate summary
+            print(f"Generating summary for: {title}")
             summary = await summarize_text(clean_pdf_text, title)
             summaries_store[report_data["id"]] = summary
             report_data["summary_available"] = True
@@ -124,9 +125,11 @@ async def process_ipcc_report(report_url: str):
         return report_data
     except Exception as e:
         print(f"Error processing report: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return None
 
-async def scrape_ipcc_reports(limit: int = 5):
+async def scrape_ipcc_reports(limit: int = 3):  # Reduced to 3 reports for free tier
     base_url = "https://www.ipcc.ch"
     reports_url = f"{base_url}/reports/"
     
@@ -150,6 +153,8 @@ async def scrape_ipcc_reports(limit: int = 5):
         return [r for r in results if r is not None]
     except Exception as e:
         print(f"Scraping error: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return []
 
 @app.post("/scrape")
@@ -188,7 +193,8 @@ async def home():
             "scrape_reports": "POST /scrape",
             "list_reports": "GET /reports",
             "get_report": "GET /report/{id}"
-        }
+        },
+        "note": "Free tier limitations: Processes first 3 reports, 10 pages per PDF, 5000 characters per summary"
     }
 
 @app.get("/health")
