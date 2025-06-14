@@ -4,7 +4,7 @@ import asyncio
 import aiohttp
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from bs4 import BeautifulSoup
-from deepseek import DeepSeek  # Correct import for deepseek-sdk
+from openai import AsyncOpenAI  # Use OpenAI client for DeepSeek
 import pdfplumber
 from io import BytesIO
 import json
@@ -14,10 +14,13 @@ from typing import List, Dict
 
 app = FastAPI(title="ClimateSense AI", version="1.0.0")
 
-# Initialize DeepSeek client
-client = DeepSeek(api_key=os.getenv("DEEPSEEK_API_KEY"))
+# Initialize DeepSeek client using OpenAI SDK
+client = AsyncOpenAI(
+    api_key=os.getenv("DEEPSEEK_API_KEY"),
+    base_url="https://api.deepseek.com/v1"  # DeepSeek API endpoint
+)
 
-# In-memory storage for demo (use database in production)
+# In-memory storage for demo
 reports_store = []
 summaries_store = {}
 
@@ -34,7 +37,7 @@ async def fetch_pdf(url: str):
         async with session.get(url) as response:
             return await response.read()
 
-def extract_text_from_pdf(pdf_bytes: bytes, max_pages: int = 10) -> str:  # Reduced to 10 pages for free tier
+def extract_text_from_pdf(pdf_bytes: bytes, max_pages: int = 10) -> str:
     text = ""
     try:
         with pdfplumber.open(BytesIO(pdf_bytes)) as pdf:
@@ -49,22 +52,37 @@ def extract_text_from_pdf(pdf_bytes: bytes, max_pages: int = 10) -> str:  # Redu
     return text
 
 def clean_text(text: str) -> str:
-    # Remove excessive whitespace and line breaks
     text = re.sub(r'\s+', ' ', text)
-    # Remove page numbers and headers
     text = re.sub(r'\bPage \d+\b', '', text)
     return text.strip()
 
 async def summarize_text(text: str, report_title: str) -> Dict:
     try:
-        response = client.generate(
-            f"You are a climate science expert summarizing IPCC reports. "
-            f"Create a structured summary of this report section in JSON format with these keys: "
-            f"key_findings (list), risks (list), mitigation_options (list), confidence_level (string). "
-            f"Report Title: {report_title}\n\n"
-            f"Text: {text[:5000]}"  # Reduced to 5000 characters for free tier
+        # Use OpenAI-compatible API call
+        response = await client.chat.completions.create(
+            model="deepseek-chat",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a climate science expert summarizing IPCC reports. Return output in JSON format."
+                },
+                {
+                    "role": "user",
+                    "content": (
+                        f"Create a structured summary with these keys: "
+                        f"key_findings (list), risks (list), mitigation_options (list), confidence_level (string). "
+                        f"Report Title: {report_title}\n\n"
+                        f"Text: {text[:5000]}"
+                    )
+                }
+            ],
+            response_format={"type": "json_object"},
+            max_tokens=1000
         )
-        return json.loads(response.text)
+        
+        # Extract JSON content
+        summary_str = response.choices[0].message.content
+        return json.loads(summary_str)
     except Exception as e:
         print(f"Summarization error: {str(e)}")
         return {
@@ -129,7 +147,7 @@ async def process_ipcc_report(report_url: str):
         traceback.print_exc()
         return None
 
-async def scrape_ipcc_reports(limit: int = 3):  # Reduced to 3 reports for free tier
+async def scrape_ipcc_reports(limit: int = 3):
     base_url = "https://www.ipcc.ch"
     reports_url = f"{base_url}/reports/"
     
@@ -194,7 +212,7 @@ async def home():
             "list_reports": "GET /reports",
             "get_report": "GET /report/{id}"
         },
-        "note": "Free tier limitations: Processes first 3 reports, 10 pages per PDF, 5000 characters per summary"
+        "note": "Free tier limitations: Processes first 3 reports, 10 pages per PDF"
     }
 
 @app.get("/health")
