@@ -1,66 +1,11 @@
-{% extends "templates/base.html" %}
-
-{% block content %}
-<section class="hero">
-    <div class="hero-content">
-        <h2>AI-Powered IPCC Report Analysis</h2>
-        <p>Instant summaries and key insights from complex climate reports</p>
-        <button id="scrapeBtn" class="btn-primary">Get Latest Reports</button>
-    </div>
-</section>
-
-<section class="features">
-    <div class="feature-card">
-        <h3>📚 Comprehensive</h3>
-        <p>Processes full IPCC reports with scientific accuracy</p>
-    </div>
-    <div class="feature-card">
-        <h3>⚡️ Fast Summaries</h3>
-        <p>Get executive summaries in seconds, not hours</p>
-    </div>
-    <div class="feature-card">
-        <h3>🌍 Actionable Insights</h3>
-        <p>Key findings, risks, and mitigation strategies</p>
-    </div>
-</section>
-
-<section class="demo">
-    <h2>How It Works</h2>
-    <ol>
-        <li>Automatically retrieves latest IPCC reports</li>
-        <li>Extracts and processes content using AI</li>
-        <li>Generates concise summaries and insights</li>
-        <li>Delivers results to web or mobile</li>
-    </ol>
-</section>
-{% endblock %}
-
-{% block scripts %}
-<script>
-    document.getElementById('scrapeBtn').addEventListener('click', async () => {
-        const btn = document.getElementById('scrapeBtn');
-        btn.disabled = true;
-        btn.textContent = "Processing...";
-        
-        try {
-            const response = await fetch('/scrape', { method: 'POST' });
-            const data = await response.json();
-            
-            if(data.status === 'success') {
-                // Redirect to reports page after 2 seconds
-                setTimeout(() => {
-                    window.location.href = '/reports';
-                }, 2000);
-            } else {
-                alert('Error: ' + data.message);
-                btn.disabled = false;
-                btn.textContent = "Get Latest Reports";
-            }
-        } catch (error) {
-            alert('Connection error: ' + error.message);
-            btn.disabled = false;
-            btn.textContent = "Get Latest Reports";
-        }
-    });
-</script>
-{% endblock %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ClimateSense AI</title>
+    <link rel="icon" href="/static/favicon.ico">
+</head>
+<body>
+    <h1>Welcome to ClimateSense AI</h1>
+    <!-- Your content here -->
+</body>
+</html>
