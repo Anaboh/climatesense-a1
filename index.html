@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClimateSense AI - IPCC Report Chat</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --assistant-bg: #f0f7ff;
+            --user-bg: #e3f2fd;
+            --border: #e0e0e0;
+            --text: #333;
+            --light-text: #777;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: #f8f9fa;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), #1a2530);
+            color: white;
+            padding: 15px 20px;
+            box-shadow: var(--shadow);
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 1.4rem;
+        }
+        
+        .logo-icon {
+            font-size: 1.8rem;
+        }
+        
+        .report-context {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 5px 15px;
+            font-size: 0.9rem;
+            max-width: 60%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        .sidebar {
+            width: 300px;
+            background: white;
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+        
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .message {
+            max-width: 85%;
+            padding: 15px;
+            border-radius: 18px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .user-message {
+            background-color: var(--user-bg);
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .assistant-message {
+            background-color: var(--assistant-bg);
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+            color: var(--light-text);
+        }
+        
+        .input-container {
+            padding: 15px;
+            background: white;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+        }
+        
+        #message-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        #message-input:focus {
+            border-color: var(--secondary);
+        }
+        
+        #send-button {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: background 0.3s;
+        }
+        
+        #send-button:hover {
+            background: #2980b9;
+        }
+        
+        .reports-section {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .reports-section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .reports-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .report-item {
+            padding: 12px;
+            border-radius: 10px;
+            background: #f9f9f9;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .report-item:hover {
+            background: #f0f0f0;
+        }
+        
+        .report-item h3 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .report-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--light-text);
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: var(--assistant-bg);
+            align-self: flex-start;
+            border-radius: 18px;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #666;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+        
+        .sidebar-toggle {
+            display: none;
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 101;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                height: 100%;
+                transform: translateX(-100%);
+                z-index: 100;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .sidebar-toggle {
+                display: block;
+            }
+            
+            .header-content {
+                padding-left: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🌍</div>
+                <h1>ClimateSense AI</h1>
+            </div>
+            <div class="report-context" id="current-context">No report selected</div>
+        </div>
+    </header>
+    
+    <button class="sidebar-toggle" id="sidebar-toggle">≡</button>
+    
+    <div class="container">
+        <div class="sidebar" id="sidebar">
+            <div class="reports-section">
+                <h2>📚 IPCC Reports</h2>
+                <div class="reports-list" id="reports-list">
+                    <div class="loader">Loading reports...</div>
+                </div>
+            </div>
+            <div class="reports-section">
+                <h2>🔄 Actions</h2>
+                <button id="scrape-reports" class="btn-primary" style="width: 100%; padding: 12px; margin-bottom: 10px;">
+                    Load Latest Reports
+                </button>
+                <button id="clear-context" class="btn-secondary" style="width: 100%; padding: 12px;">
+                    Clear Report Context
+                </button>
+            </div>
+        </div>
+        
+        <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+                <div class="message assistant-message">
+                    <div class="message-header">
+                        <strong>ClimateSense AI</strong>
+                        <span>Just now</span>
+                    </div>
+                    <p>Hello! I'm ClimateSense AI, your expert on IPCC climate reports. 🌍</p>
+                    <p>You can ask me to:</p>
+                    <ul>
+                        <li>Summarize IPCC reports</li>
+                        <li>Explain climate concepts</li>
+                        <li>Analyze climate risks</li>
+                        <li>Discuss mitigation strategies</li>
+                    </ul>
+                    <p>First, please select a report from the sidebar or ask me to find the latest reports.</p>
+                </div>
+            </div>
+            
+            <div class="input-container">
+                <input type="text" id="message-input" placeholder="Ask about climate reports...">
+                <button id="send-button">➤</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // DOM Elements
+        const chatMessages = document.getElementById('chat-messages');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const reportsList = document.getElementById('reports-list');
+        const currentContext = document.getElementById('current-context');
+        const scrapeButton = document.getElementById('scrape-reports');
+        const clearContextButton = document.getElementById('clear-context');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        
+        // State
+        let sessionId = localStorage.getItem('sessionId') || generateSessionId();
+        let currentReport = null;
+        
+        // Initialize session
+        localStorage.setItem('sessionId', sessionId);
+        
+        // Generate unique session ID
+        function generateSessionId() {
+            return 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        }
+        
+        // Add message to chat
+        function addMessage(role, content) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', `${role}-message`);
+            
+            const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            messageDiv.innerHTML = `
+                <div class="message-header">
+                    <strong>${role === 'user' ? 'You' : 'ClimateSense AI'}</strong>
+                    <span>${timestamp}</span>
+                </div>
+                <p>${content}</p>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Show typing indicator
+        function showTyping() {
+            const typingDiv = document.createElement('div');
+            typingDiv.classList.add('typing-indicator');
+            typingDiv.id = 'typing-indicator';
+            
+            typingDiv.innerHTML = `
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            `;
+            
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Hide typing indicator
+        function hideTyping() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+        
+        // Send message to backend
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            // Add user message to UI
+            addMessage('user', message);
+            messageInput.value = '';
+            
+            // Show typing indicator
+            showTyping();
+            
+            try {
+                // Send to backend
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        message: message
+                    })
+                });
+                
+                const data = await response.json();
+                hideTyping();
+                
+                if (data.error) {
+                    addMessage('assistant', `Sorry, I encountered an error: ${data.error}`);
+                    return;
+                }
+                
+                // Add AI response to UI
+                addMessage('assistant', data.response);
+                
+            } catch (error) {
+                hideTyping();
+                addMessage('assistant', `Sorry, I'm having trouble connecting. Please try again.`);
+                console.error('Error:', error);
+            }
+        }
+        
+        // Load reports from backend
+        async function loadReports() {
+            reportsList.innerHTML = '<div class="loader">Loading reports...</div>';
+            
+            try {
+                const response = await fetch('/reports');
+                const data = await response.json();
+                
+                if (data.count === 0) {
+                    reportsList.innerHTML = '<div class="empty">No reports found. Try loading reports.</div>';
+                    return;
+                }
+                
+                reportsList.innerHTML = '';
+                data.reports.forEach(report => {
+                    const reportItem = document.createElement('div');
+                    reportItem.classList.add('report-item');
+                    reportItem.dataset.id = report.id;
+                    
+                    reportItem.innerHTML = `
+                        <h3>${report.title}</h3>
+                        <div class="report-meta">
+                            <span>${report.date}</span>
+                            <span>${report.summary_available ? '✅ Ready' : '⏳ Processing'}</span>
+                        </div>
+                    `;
+                    
+                    reportItem.addEventListener('click', () => {
+                        setReportContext(report.id);
+                    });
+                    
+                    reportsList.appendChild(reportItem);
+                });
+            } catch (error) {
+                reportsList.innerHTML = '<div class="error">Error loading reports</div>';
+                console.error('Error loading reports:', error);
+            }
+        }
+        
+        // Set report context
+        async function setReportContext(reportId) {
+            try {
+                const response = await fetch('/set-context', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        report_id: reportId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                
+                currentReport = data;
+                currentContext.textContent = data.report;
+                
+                // Add context message to chat
+                addMessage('system', `You've selected the report: "${data.report}"`);
+                
+                // If summary is available, show it
+                if (data.summary_available) {
+                    const reportResponse = await fetch(`/report/${reportId}`);
+                    const reportData = await reportResponse.json();
+                    
+                    const summary = reportData.summary;
+                    const summaryText = `
+                        <p><strong>Key Findings:</strong></p>
+                        <ul>
+                            ${summary.key_findings.map(f => `<li>${f}</li>`).join('')}
+                        </ul>
+                        <p><strong>Risks:</strong></p>
+                        <ul>
+                            ${summary.risks.map(r => `<li>${r}</li>`).join('')}
+                        </ul>
+                        <p><strong>Mitigation Options:</strong></p>
+                        <ul>
+                            ${summary.mitigation_options.map(m => `<li>${m}</li>`).join('')}
+                        </ul>
+                        <p><strong>Confidence Level:</strong> ${summary.confidence_level}</p>
+                    `;
+                    
+                    addMessage('assistant', summaryText);
+                }
+                
+            } catch (error) {
+                console.error('Error setting context:', error);
+                alert('Failed to set report context');
+            }
+        }
+        
+        // Clear report context
+        function clearReportContext() {
+            currentReport = null;
+            currentContext.textContent = 'No report selected';
+            addMessage('system', 'Report context cleared');
+        }
+        
+        // Scrape new reports
+        async function scrapeReports() {
+            try {
+                const response = await fetch('/scrape', {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                alert(data.message);
+                
+                // Reload reports after 5 seconds
+                setTimeout(loadReports, 5000);
+            } catch (error) {
+                console.error('Error scraping reports:', error);
+                alert('Failed to start scraping');
+            }
+        }
+        
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        scrapeButton.addEventListener('click', scrapeReports);
+        clearContextButton.addEventListener('click', clearReportContext);
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+        
+        // Initialize
+        loadReports();
+    </script>
+</body>
+</html>
