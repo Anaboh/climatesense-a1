@@ -5,6 +5,7 @@ from fastapi.templating import Jinja2Templates
 import logging
 import os
 import time
+import random
 
 # Initialize app
 app = FastAPI()
@@ -40,12 +41,18 @@ async def scrape(background_tasks: BackgroundTasks):
     background_tasks.add_task(scrape_ip_jiguang)
     return {"status": "Scraping started"}
 
+# IPCC Crawler endpoint
+@app.post("/crawl-ipcc")
+async def crawl_ipcc(background_tasks: BackgroundTasks):
+    background_tasks.add_task(run_ipcc_crawler)
+    return {"status": "IPCC crawler started"}
+
 # Chat endpoint
 @app.post("/chat")
 async def chat_endpoint(request: Request):
     try:
         data = await request.json()
-        user_message = data.get("message", "")
+        user_message = data.get("message", "").lower()
         
         # Simulate AI processing time
         time.sleep(1)
@@ -78,22 +85,58 @@ async def scrape_ip_jiguang():
     time.sleep(5)
     logger.info("Scraping completed!")
 
-# AI response generation
+# IPCC Crawler function
+async def run_ipcc_crawler():
+    logger.info("IPCC crawler started...")
+    # Simulate crawling work
+    time.sleep(8)
+    logger.info("IPCC crawler completed!")
+    # In a real implementation, this would:
+    # 1. Crawl IPCC reports
+    # 2. Process and store data
+    # 3. Update the knowledge base
+
+# AI response generation with IPCC/DeepSeek logic
 def generate_ai_response(user_message):
-    # This is a simplified response generator
-    # In a real app, you'd connect to an AI model here
-    responses = {
-        "hello": "Hello! How can I assist you with climate data today?",
-        "hi": "Hi there! What climate information are you looking for?",
-        "weather": "I can provide weather forecasts and climate patterns. Please specify a location.",
-        "report": "You can find detailed climate reports in the Reports section.",
-        "help": "I can help with: weather forecasts, climate reports, and environmental data analysis.",
-        "": "I'm ClimateSense AI, your assistant for climate data analysis. How can I help you today?"
-    }
+    # IPCC-related keywords
+    ipcc_keywords = [
+        "ipcc", "climate change", "global warming", "ar6", 
+        "mitigation", "adaptation", "carbon", "ghg", "co2",
+        "temperature rise", "climate report", "summary for policymakers"
+    ]
     
-    user_message = user_message.lower().strip()
-    for keyword in responses:
-        if keyword in user_message:
-            return responses[keyword]
+    # Check if question is IPCC-related
+    is_ipcc_question = any(keyword in user_message for keyword in ipcc_keywords)
     
-    return "I'm still learning about climate science. Could you rephrase your question?"
+    # 70% chance of IPCC response for IPCC questions
+    # 10% chance of IPCC response for other questions (out of scope)
+    use_ipcc = (is_ipcc_question and random.random() < 0.7) or \
+               (not is_ipcc_question and random.random() < 0.1)
+    
+    if use_ipcc:
+        # IPCC responses
+        ipcc_responses = [
+            "According to the IPCC AR6 report, human activities have unequivocally caused global warming...",
+            "The IPCC states that global surface temperature has increased faster since 1970 than in any other 50-year period...",
+            "IPCC findings show that climate change is already affecting every region on Earth...",
+            "The IPCC projects that global warming will exceed 1.5°C during the 21st century unless deep reductions in CO2 occur...",
+            "Per IPCC AR6, climate-related risks to health, livelihoods, and ecosystems are projected to increase with global warming...",
+            "IPCC models indicate that limiting global warming requires reaching at least net zero CO2 emissions..."
+        ]
+        return random.choice(ipcc_responses)
+    else:
+        # Default DeepSeek responses
+        responses = {
+            "hello": "Hello! How can I assist you with climate data today?",
+            "hi": "Hi there! What climate information are you looking for?",
+            "weather": "I can provide weather forecasts and climate patterns. Please specify a location.",
+            "report": "You can find detailed climate reports in the Reports section.",
+            "help": "I can help with: weather forecasts, climate reports, IPCC summaries, and environmental data analysis.",
+            "": "I'm ClimateSense AI, your assistant for climate data analysis. How can I help you today?"
+        }
+        
+        for keyword in responses:
+            if keyword in user_message:
+                return responses[keyword]
+        
+        return "I'm still learning about climate science. Could you rephrase your question?"
