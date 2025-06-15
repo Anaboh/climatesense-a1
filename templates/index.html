@@ -6,6 +6,36 @@
 </head>
 <body>
     <h1>Welcome to ClimateSense AI</h1>
-    <!-- Your content here -->
+    <p>Primary URL: <a href="https://climatesense-ai.onrender.com">https://climatesense-ai.onrender.com</a></p>
+    
+    <div>
+        <h2>Actions:</h2>
+        <button onclick="startScrape()">Start Scraping</button>
+        <div id="scrape-result"></div>
+        
+        <h2>Chat:</h2>
+        <input type="text" id="message" placeholder="Type your message">
+        <button onclick="sendMessage()">Send</button>
+        <div id="chat-response"></div>
+    </div>
+
+    <script>
+        async function startScrape() {
+            const response = await fetch('/scrape', { method: 'POST' });
+            const result = await response.json();
+            document.getElementById('scrape-result').innerText = `Status: ${result.status}`;
+        }
+
+        async function sendMessage() {
+            const message = document.getElementById('message').value;
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ message })
+            });
+            const result = await response.json();
+            document.getElementById('chat-response').innerText = result.response;
+        }
+    </script>
 </body>
 </html>
