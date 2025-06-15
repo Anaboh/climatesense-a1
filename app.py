@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import logging
+import os
 
 # Initialize app
 app = FastAPI()
@@ -11,11 +12,16 @@ app = FastAPI()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Get current directory
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
 # Serve static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
+static_dir = os.path.join(current_dir, "static")
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 # Setup templates
-templates = Jinja2Templates(directory="templates")
+templates_dir = os.path.join(current_dir, "templates")
+templates = Jinja2Templates(directory=templates_dir)
 
 # Root endpoint
 @app.get("/", response_class=HTMLResponse)
@@ -47,7 +53,7 @@ async def chat_endpoint(request: Request):
 # Favicon endpoint
 @app.get("/favicon.ico")
 async def favicon():
-    return FileResponse("static/favicon.ico")
+    return FileResponse(os.path.join(static_dir, "favicon.ico"))
 
 # Error handler
 @app.exception_handler(404)
