@@ -235,7 +235,7 @@ async def scrape_ipcc_reports(limit: int = 3):
 @app.post("/scrape")
 async def start_scrape(background_tasks: BackgroundTasks):
     try:
-        background_tasks.add_task(scrape_ip极光
+        background_tasks.add_task(scrape_ip_jiguang)
         return {
             "status": "success",
             "message": "Scraping started in background. Reports will be available soon."
