@@ -5,103 +5,317 @@
     <link rel="icon" href="/static/favicon.ico">
     <link rel="stylesheet" href="/static/styles.css">
     <style>
+        .reports-header {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+        
+        .reports-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
         .reports-container {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 0 20px;
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 16px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
         }
         
         .report-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+            gap: 24px;
+            margin-bottom: 40px;
         }
         
         .report-card {
             border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 20px;
-            background: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow: hidden;
+            background: var(--card-bg);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             transition: transform 0.2s, box-shadow 0.2s;
         }
         
         .report-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+        
+        .report-image {
+            height: 160px;
+            background: linear-gradient(120deg, #10a37f, #0d8e6c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .report-content {
+            padding: 20px;
         }
         
         .report-title {
-            font-size: 1.2rem;
+            font-size: 18px;
             font-weight: 600;
-            margin-bottom: 10px;
-            color: var(--primary);
+            margin-bottom: 12px;
+            color: var(--text-primary);
         }
         
-        .report-date {
+        .report-meta {
+            display: flex;
+            justify-content: space-between;
             color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 15px;
+            font-size: 14px;
+            margin-bottom: 16px;
         }
         
         .report-summary {
-            line-height: 1.5;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        
+        .report-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .report-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .view-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+        }
+        
+        .view-btn:hover {
+            background: #0d8e6c;
+        }
+        
+        .download-btn {
+            background: transparent;
+            border: 1px solid var(--border);
             color: var(--text-primary);
+        }
+        
+        .download-btn:hover {
+            background: var(--input-bg);
         }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="logo">ClimateSense AI</div>
-        <nav class="sidebar-nav">
-            <a href="/">Chat</a>
-            <a href="/reports" class="active">Reports</a>
-            <a href="#" onclick="startScrape()">Scrape Data</a>
-        </nav>
+    <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+    
+    <div class="theme-toggle" id="theme-toggle">
+        <svg id="light-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 2V4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 20V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4.93 4.93L6.34 6.34" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M17.66 17.66L19.07 19.07" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 12H4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M20 12H22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6.34 17.66L4.93 19.07" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M19.07 4.93L17.66 6.34" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <svg id="dark-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="new-chat-btn" onclick="location.href='/'">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 4V20M4 12H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                New chat
+            </button>
+            <button class="ipcc-crawler-btn" onclick="startIPCCCrawler()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 19C15.866 19 19 15.866 19 12C19 8.13401 15.866 5 12 5C8.13401 5 5 8.13401 5 12C5 15.866 8.13401 19 12 19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 9V12L14.5 13.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16 5V3M19 6L17 4M21 12H19M19 19L17 17M12 21V19M7 17L5 19M3 12H5M7 7L5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                IPCC Crawler
+            </button>
+        </div>
+        
+        <div class="sidebar-nav">
+            <div class="chat-history">
+                <div class="chat-item" onclick="location.href='/'">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Chat</span>
+                </div>
+                <div class="chat-item active">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 12H15M9 16H15M10 5H14C14.5523 5 15 5.44772 15 6V20C15 20.5523 14.5523 21 14 21H10C9.44772 21 9 20.5523 9 20V6C9 5.44772 9.44772 5 10 5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <span>Reports</span>
+                </div>
+            </div>
+        </div>
     </div>
     
     <div class="main-content">
-        <header>
-            <h1>Climate Data Reports</h1>
-        </header>
+        <div class="reports-header">
+            <div class="reports-title">ClimateSense AI - IPCC Reports</div>
+        </div>
         
         <div class="reports-container">
-            <h2>Latest Climate Reports</h2>
+            <h2 class="section-title">IPCC Assessment Reports</h2>
             <div class="report-grid">
                 <div class="report-card">
-                    <div class="report-title">Global Temperature Analysis</div>
-                    <div class="report-date">June 10, 2025</div>
-                    <div class="report-summary">
-                        Comprehensive analysis of global temperature trends over the past decade, 
-                        highlighting regional variations and long-term patterns.
+                    <div class="report-image">AR6 SYR</div>
+                    <div class="report-content">
+                        <div class="report-title">AR6 Synthesis Report</div>
+                        <div class="report-meta">
+                            <span>March 2023</span>
+                            <span>Summary for Policymakers</span>
+                        </div>
+                        <div class="report-summary">
+                            Integrates findings from all AR6 working groups, summarizing the current state of knowledge on climate change.
+                        </div>
+                        <div class="report-actions">
+                            <button class="report-btn view-btn">View Report</button>
+                            <button class="report-btn download-btn">Download</button>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="report-card">
-                    <div class="report-title">Arctic Sea Ice Report</div>
-                    <div class="report-date">June 5, 2025</div>
-                    <div class="report-summary">
-                        Assessment of sea ice extent and thickness in the Arctic region, 
-                        with projections for the coming summer season.
+                    <div class="report-image">AR6 WGI</div>
+                    <div class="report-content">
+                        <div class="report-title">AR6 Working Group I</div>
+                        <div class="report-meta">
+                            <span>August 2021</span>
+                            <span>The Physical Science Basis</span>
+                        </div>
+                        <div class="report-summary">
+                            Assesses the physical science basis of climate change with updated global climate projections.
+                        </div>
+                        <div class="report-actions">
+                            <button class="report-btn view-btn">View Report</button>
+                            <button class="report-btn download-btn">Download</button>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="report-card">
-                    <div class="report-title">Carbon Emissions Update</div>
-                    <div class="report-date">May 28, 2025</div>
-                    <div class="report-summary">
-                        Quarterly update on global carbon emissions with sector-specific analysis 
-                        and progress toward international climate goals.
+                    <div class="report-image">AR6 WGII</div>
+                    <div class="report-content">
+                        <div class="report-title">AR6 Working Group II</div>
+                        <div class="report-meta">
+                            <span>February 2022</span>
+                            <span>Impacts, Adaptation, Vulnerability</span>
+                        </div>
+                        <div class="report-summary">
+                            Evaluates climate change impacts on ecosystems, biodiversity, and human communities.
+                        </div>
+                        <div class="report-actions">
+                            <button class="report-btn view-btn">View Report</button>
+                            <button class="report-btn download-btn">Download</button>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="report-card">
-                    <div class="report-title">Extreme Weather Events</div>
-                    <div class="report-date">May 20, 2025</div>
-                    <div class="report-summary">
-                        Catalog and analysis of recent extreme weather events globally, 
-                        with climate change attribution studies.
+                    <div class="report-image">AR6 WGIII</div>
+                    <div class="report-content">
+                        <div class="report-title">AR6 Working Group III</div>
+                        <div class="report-meta">
+                            <span>April 2022</span>
+                            <span>Mitigation of Climate Change</span>
+                        </div>
+                        <div class="report-summary">
+                            Assesses methods for reducing greenhouse gas emissions and removing greenhouse gases from the atmosphere.
+                        </div>
+                        <div class="report-actions">
+                            <button class="report-btn view-btn">View Report</button>
+                            <button class="report-btn download-btn">Download</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h2 class="section-title">Special Reports</h2>
+            <div class="report-grid">
+                <div class="report-card">
+                    <div class="report-image">SR15</div>
+                    <div class="report-content">
+                        <div class="report-title">Global Warming of 1.5°C</div>
+                        <div class="report-meta">
+                            <span>October 2018</span>
+                            <span>Special Report</span>
+                        </div>
+                        <div class="report-summary">
+                            Assesses impacts of global warming of 1.5°C above pre-industrial levels and related emission pathways.
+                        </div>
+                        <div class="report-actions">
+                            <button class="report-btn view-btn">View Report</button>
+                            <button class="report-btn download-btn">Download</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="report-card">
+                    <div class="report-image">SRCCL</div>
+                    <div class="report-content">
+                        <div class="report-title">Climate Change and Land</div>
+                        <div class="report-meta">
+                            <span>August 2019</span>
+                            <span>Special Report</span>
+                        </div>
+                        <div class="report-summary">
+                            Addresses greenhouse gas fluxes in land-based ecosystems, land use and sustainable land management.
+                        </div>
+                        <div class="report-actions">
+                            <button class="report-btn view-btn">View Report</button>
+                            <button class="report-btn download-btn">Download</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="report-card">
+                    <div class="report-image">SROCC</div>
+                    <div class="report-content">
+                        <div class="report-title">Ocean and Cryosphere</div>
+                        <div class="report-meta">
+                            <span>September 2019</span>
+                            <span>Special Report</span>
+                        </div>
+                        <div class="report-summary">
+                            Assesses climate change impacts on ocean and cryosphere and options for resilience and adaptation.
+                        </div>
+                        <div class="report-actions">
+                            <button class="report-btn view-btn">View Report</button>
+                            <button class="report-btn download-btn">Download</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -109,13 +323,50 @@
     </div>
 
     <script>
-        async function startScrape() {
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+        
+        // Theme toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const lightIcon = document.getElementById('light-icon');
+        const darkIcon = document.getElementById('dark-icon');
+        
+        // Check for saved theme preference
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            lightIcon.style.display = 'none';
+            darkIcon.style.display = 'block';
+        } else {
+            lightIcon.style.display = 'block';
+            darkIcon.style.display = 'none';
+        }
+        
+        themeToggle.addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                lightIcon.style.display = 'none';
+                darkIcon.style.display = 'block';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                lightIcon.style.display = 'block';
+                darkIcon.style.display = 'none';
+                localStorage.setItem('theme', 'light');
+            }
+        });
+        
+        // Start IPCC crawler
+        async function startIPCCCrawler() {
             try {
-                const response = await fetch('/scrape', { method: 'POST' });
+                const response = await fetch('/crawl-ipcc', {
+                    method: 'POST'
+                });
                 const result = await response.json();
-                alert(`Scraping started: ${result.status}`);
+                alert(`IPCC crawler started: ${result.status}. This may take a few minutes...`);
             } catch (error) {
-                alert('Failed to start scraping.');
+                alert('Failed to start IPCC crawler.');
                 console.error('Error:', error);
             }
         }
