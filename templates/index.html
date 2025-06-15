@@ -3,39 +3,276 @@
 <head>
     <title>ClimateSense AI</title>
     <link rel="icon" href="/static/favicon.ico">
+    <link rel="stylesheet" href="/static/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        /* Add any additional styles here */
+    </style>
 </head>
 <body>
-    <h1>Welcome to ClimateSense AI</h1>
-    <p>Primary URL: <a href="https://climatesense-ai.onrender.com">https://climatesense-ai.onrender.com</a></p>
+    <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
     
-    <div>
-        <h2>Actions:</h2>
-        <button onclick="startScrape()">Start Scraping</button>
-        <div id="scrape-result"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="new-chat-btn" onclick="newChat()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 4V20M4 12H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                New chat
+            </button>
+        </div>
         
-        <h2>Chat:</h2>
-        <input type="text" id="message" placeholder="Type your message">
-        <button onclick="sendMessage()">Send</button>
-        <div id="chat-response"></div>
+        <div class="sidebar-nav">
+            <div class="chat-history">
+                <div class="chat-item active">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Climate Discussion</span>
+                </div>
+                <div class="chat-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Carbon Emissions</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <div class="chat-header">
+            <div class="chat-title">ClimateSense AI</div>
+        </div>
+        
+        <div class="chat-container" id="chat-container">
+            <!-- Welcome screen -->
+            <div class="welcome-container" id="welcome-container">
+                <h1 class="welcome-title">ClimateSense AI Assistant</h1>
+                <p class="welcome-subtitle">Your AI-powered assistant for climate data analysis, environmental insights, and sustainability solutions.</p>
+                
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#10a37f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Climate Analysis
+                        </h3>
+                        <p>Get detailed analysis of climate patterns, temperature trends, and environmental changes.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 15C3 17.8284 3 19.2426 3.87868 20.1213C4.75736 21 6.17157 21 9 21H15C17.8284 21 19.2426 21 20.1213 20.1213C21 19.2426 21 17.8284 21 15M3 15C3 12.1716 3 10.7574 3.87868 9.87868C4.75736 9 6.17157 9 9 9H15C17.8284 9 19.2426 9 20.1213 9.87868C21 10.7574 21 12.1716 21 15M3 15V9M21 15V9" stroke="#10a37f" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M9 8L9 5C9 4.44772 9.44772 4 10 4H14C14.5523 4 15 4.44772 15 5V8" stroke="#10a37f" stroke-width="2" stroke-linecap="round"/>
+                                <circle cx="12" cy="15" r="1" fill="#10a37f"/>
+                            </svg>
+                            Data Reports
+                        </h3>
+                        <p>Access comprehensive reports on carbon emissions, sea levels, and biodiversity metrics.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 20H15M9 20C6.19974 17.33 4.66388 14.1335 4.24974 12.0001C3.99966 10.7051 3.99966 9.29487 4.24974 7.99989C5.32278 5.91233 7.9136 4 12 4C16.0864 4 18.6772 5.91233 19.7503 7.99989C20.0003 9.29487 20.0003 10.7051 19.7503 12.0001C19.3361 14.1335 17.8003 17.33 15 20M9 20C9.33333 19 10.8 15.8 14 15.5M15 20C14.6667 19 13.2 15.8 10 15.5" stroke="#10a37f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Predictions
+                        </h3>
+                        <p>Receive AI-powered predictions on future climate scenarios and environmental impacts.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#10a37f" stroke-width="2"/>
+                                <path d="M12 16V12M12 8H12.01" stroke="#10a37f" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            Expert Advice
+                        </h3>
+                        <p>Get recommendations for sustainable practices and climate change mitigation strategies.</p>
+                    </div>
+                </div>
+                
+                <div class="input-container" style="max-width: 600px;">
+                    <div class="input-area">
+                        <textarea 
+                            id="welcome-input" 
+                            placeholder="Ask about climate data, reports, or predictions..." 
+                            rows="1"
+                        ></textarea>
+                        <button onclick="sendMessageFromWelcome()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="input-footer">
+                        ClimateSense AI can make mistakes. Consider checking important information.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Messages will be added here dynamically -->
+        </div>
+        
+        <div class="input-container" id="input-container" style="display: none;">
+            <div class="input-area">
+                <textarea 
+                    id="message-input" 
+                    placeholder="Message ClimateSense AI..." 
+                    rows="1"
+                    oninput="autoResize(this)"
+                    onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
+                ></textarea>
+                <button id="send-button" onclick="sendMessage()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="input-footer">
+                ClimateSense AI can make mistakes. Consider checking important information.
+            </div>
+        </div>
     </div>
 
     <script>
-        async function startScrape() {
-            const response = await fetch('/scrape', { method: 'POST' });
-            const result = await response.json();
-            document.getElementById('scrape-result').innerText = `Status: ${result.status}`;
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+        
+        // Set welcome message timestamp
+        document.getElementById('welcome-time').textContent = getCurrentTime();
+        
+        // Auto-resize textarea
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight) + 'px';
+            
+            // Limit max height
+            if (textarea.scrollHeight > 200) {
+                textarea.style.overflowY = 'auto';
+            } else {
+                textarea.style.overflowY = 'hidden';
+            }
         }
-
+        
+        // Scroll to bottom of chat
+        function scrollToBottom() {
+            const container = document.getElementById('chat-container');
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        // Get formatted time
+        function getCurrentTime() {
+            const now = new Date();
+            return now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+        
+        // Add message to chat
+        function addMessage(sender, text) {
+            // Hide welcome screen if visible
+            const welcomeContainer = document.getElementById('welcome-container');
+            if (welcomeContainer) {
+                welcomeContainer.style.display = 'none';
+                document.getElementById('input-container').style.display = 'block';
+            }
+            
+            const container = document.getElementById('chat-container');
+            const timestamp = getCurrentTime();
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.innerHTML = `
+                <div class="avatar">${sender === 'user' ? 'Y' : 'C'}</div>
+                <div class="message-content">
+                    <div class="sender">${sender === 'user' ? 'You' : 'ClimateSense AI'}</div>
+                    <div class="message-text">${text}</div>
+                </div>
+            `;
+            
+            container.appendChild(messageDiv);
+            scrollToBottom();
+        }
+        
+        // Send message from welcome screen
+        function sendMessageFromWelcome() {
+            const input = document.getElementById('welcome-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            addMessage('user', message);
+            input.value = '';
+            
+            // Simulate AI response
+            setTimeout(() => {
+                addMessage('ai', "Hello! I'm ClimateSense AI, your assistant for climate data analysis. How can I help you today?");
+            }, 1000);
+        }
+        
+        // Send message to backend
         async function sendMessage() {
-            const message = document.getElementById('message').value;
-            const response = await fetch('/chat', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ message })
-            });
-            const result = await response.json();
-            document.getElementById('chat-response').innerText = result.response;
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+            const button = document.getElementById('send-button');
+            
+            if (!message) return;
+            
+            // Disable input during processing
+            input.disabled = true;
+            button.disabled = true;
+            
+            // Add user message to chat
+            addMessage('user', message);
+            input.value = '';
+            input.style.height = 'auto';
+            
+            try {
+                // Send to backend
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ message })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Server error');
+                }
+                
+                const data = await response.json();
+                
+                // Add AI response to chat
+                addMessage('ai', data.response);
+            } catch (error) {
+                addMessage('ai', 'Sorry, I encountered an error. Please try again.');
+                console.error('Error:', error);
+            } finally {
+                // Re-enable input
+                input.disabled = false;
+                button.disabled = false;
+                input.focus();
+            }
         }
+        
+        // Start a new chat
+        function newChat() {
+            document.getElementById('chat-container').innerHTML = '';
+            document.getElementById('welcome-container').style.display = 'flex';
+            document.getElementById('input-container').style.display = 'none';
+        }
+        
+        // Initialize textarea auto-resize
+        const textareas = document.querySelectorAll('textarea');
+        textareas.forEach(textarea => {
+            textarea.addEventListener('input', function() {
+                autoResize(this);
+            });
+        });
     </script>
 </body>
 </html>
