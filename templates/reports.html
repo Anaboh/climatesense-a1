@@ -3,10 +3,122 @@
 <head>
     <title>Climate Reports</title>
     <link rel="icon" href="/static/favicon.ico">
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        .reports-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .report-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .report-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+        
+        .report-date {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        
+        .report-summary {
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+    </style>
 </head>
 <body>
-    <h1>Climate Data Reports</h1>
-    <p>Detailed reports will be displayed here.</p>
-    <a href="/">Back to Home</a>
+    <div class="sidebar">
+        <div class="logo">ClimateSense AI</div>
+        <nav class="sidebar-nav">
+            <a href="/">Chat</a>
+            <a href="/reports" class="active">Reports</a>
+            <a href="#" onclick="startScrape()">Scrape Data</a>
+        </nav>
+    </div>
+    
+    <div class="main-content">
+        <header>
+            <h1>Climate Data Reports</h1>
+        </header>
+        
+        <div class="reports-container">
+            <h2>Latest Climate Reports</h2>
+            <div class="report-grid">
+                <div class="report-card">
+                    <div class="report-title">Global Temperature Analysis</div>
+                    <div class="report-date">June 10, 2025</div>
+                    <div class="report-summary">
+                        Comprehensive analysis of global temperature trends over the past decade, 
+                        highlighting regional variations and long-term patterns.
+                    </div>
+                </div>
+                
+                <div class="report-card">
+                    <div class="report-title">Arctic Sea Ice Report</div>
+                    <div class="report-date">June 5, 2025</div>
+                    <div class="report-summary">
+                        Assessment of sea ice extent and thickness in the Arctic region, 
+                        with projections for the coming summer season.
+                    </div>
+                </div>
+                
+                <div class="report-card">
+                    <div class="report-title">Carbon Emissions Update</div>
+                    <div class="report-date">May 28, 2025</div>
+                    <div class="report-summary">
+                        Quarterly update on global carbon emissions with sector-specific analysis 
+                        and progress toward international climate goals.
+                    </div>
+                </div>
+                
+                <div class="report-card">
+                    <div class="report-title">Extreme Weather Events</div>
+                    <div class="report-date">May 20, 2025</div>
+                    <div class="report-summary">
+                        Catalog and analysis of recent extreme weather events globally, 
+                        with climate change attribution studies.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function startScrape() {
+            try {
+                const response = await fetch('/scrape', { method: 'POST' });
+                const result = await response.json();
+                alert(`Scraping started: ${result.status}`);
+            } catch (error) {
+                alert('Failed to start scraping.');
+                console.error('Error:', error);
+            }
+        }
+    </script>
 </body>
 </html>
