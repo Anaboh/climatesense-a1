@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import logging
 import os
+import time
 
 # Initialize app
 app = FastAPI()
@@ -44,8 +45,18 @@ async def scrape(background_tasks: BackgroundTasks):
 async def chat_endpoint(request: Request):
     try:
         data = await request.json()
-        # Process chat request here
-        return JSONResponse({"response": "This is a sample chat response"})
+        user_message = data.get("message", "")
+        
+        # Simulate AI processing time
+        time.sleep(1)
+        
+        # Generate response
+        ai_response = generate_ai_response(user_message)
+        
+        return JSONResponse({
+            "response": ai_response,
+            "timestamp": time.strftime("%I:%M %p")
+        })
     except Exception as e:
         logger.error(f"Chat error: {str(e)}")
         return JSONResponse({"error": "Invalid request"}, status_code=400)
@@ -62,9 +73,27 @@ async def not_found(request: Request, exc: HTTPException):
 
 # Background task function
 async def scrape_ip_jiguang():
-    # Add your actual scraping logic here
     logger.info("Scraping IP data started...")
     # Simulate work
-    import time
     time.sleep(5)
     logger.info("Scraping completed!")
+
+# AI response generation
+def generate_ai_response(user_message):
+    # This is a simplified response generator
+    # In a real app, you'd connect to an AI model here
+    responses = {
+        "hello": "Hello! How can I assist you with climate data today?",
+        "hi": "Hi there! What climate information are you looking for?",
+        "weather": "I can provide weather forecasts and climate patterns. Please specify a location.",
+        "report": "You can find detailed climate reports in the Reports section.",
+        "help": "I can help with: weather forecasts, climate reports, and environmental data analysis.",
+        "": "I'm ClimateSense AI, your assistant for climate data analysis. How can I help you today?"
+    }
+    
+    user_message = user_message.lower().strip()
+    for keyword in responses:
+        if keyword in user_message:
+            return responses[keyword]
+    
+    return "I'm still learning about climate science. Could you rephrase your question?"
