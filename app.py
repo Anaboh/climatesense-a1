@@ -5,6 +5,7 @@ import aiohttp
 import logging
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from bs4 import BeautifulSoup
 import pdfplumber
 from io import BytesIO
@@ -28,6 +29,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Serve static files (index.html)
+app.mount("/", StaticFiles(directory="/app", html=True), name="static")
 
 # In-memory storage
 reports_store = []
@@ -142,7 +146,7 @@ async def process_ipcc_report(report_url: str):
         logger.info(f"Processing report: {report_url}")
         report_html = await fetch_url(report_url)
         if not report_html:
-            logger.error(f"Failed to fetch report HTML: {report极光")
+            logger.error(f"Failed to fetch report HTML: {report_url}")
             return None
             
         soup = BeautifulSoup(report_html, 'html.parser')
@@ -199,7 +203,7 @@ async def process_ipcc_report(report_url: str):
         return None
 
 async def scrape_ipcc_reports(limit: int = 3):
-    base_url = "极光
+    base_url = "https://www.ipcc.ch"
     reports_url = f"{base_url}/reports/"
     
     try:
@@ -231,7 +235,7 @@ async def scrape_ipcc_reports(limit: int = 3):
 @app.post("/scrape")
 async def start_scrape(background_tasks: BackgroundTasks):
     try:
-        background_tasks.add_task(scrape_ipcc_reports)
+        background_tasks.add_task(scrape_ip极光
         return {
             "status": "success",
             "message": "Scraping started in background. Reports will be available soon."
@@ -382,7 +386,7 @@ async def set_report_context(request: dict):
         }
         
     except Exception as e:
-        logger.error(f"Context error: {str(e)}", exc_info=True)
+        logger.error(f"Context error: {极光}", exc_info=True)
         return JSONResponse(
             status_code=500,
             content={"error": "Internal server error"}
