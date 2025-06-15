@@ -1,96 +1,11 @@
-{% extends "templates/base.html" %}
-
-{% block content %}
-<section class="reports-header">
-    <h2>IPCC Reports</h2>
-    <p>Click any report to see AI-generated summary</p>
-    <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Search reports...">
-        <button id="searchBtn">🔍</button>
-    </div>
-</section>
-
-<section class="reports-list" id="reportsList">
-    <div class="loader">Loading reports...</div>
-</section>
-{% endblock %}
-
-{% block scripts %}
-<script>
-    // Load reports on page load
-    document.addEventListener('DOMContentLoaded', async () => {
-        const reportsList = document.getElementById('reportsList');
-        reportsList.innerHTML = '<div class="loader">Loading reports...</div>';
-        
-        try {
-            const response = await fetch('/reports');
-            const data = await response.json();
-            
-            if(data.count === 0) {
-                reportsList.innerHTML = `
-                    <div class="empty-state">
-                        <p>No reports found.</p>
-                        <a href="/" class="btn-primary">Scrape Reports</a>
-                    </div>
-                `;
-                return;
-            }
-            
-            let html = '';
-            data.reports.forEach(report => {
-                html += `
-                <div class="report-card" data-id="${report.id}">
-                    <h3>${report.title}</h3>
-                    <div class="meta">
-                        <span class="date">${report.date}</span>
-                        ${report.summary_available ? 
-                          '<span class="badge success">Summary Available</span>' : 
-                          '<span class="badge warning">Processing</span>'}
-                    </div>
-                    <div class="actions">
-                        <button class="btn-secondary view-summary">View Summary</button>
-                    </div>
-                </div>
-                `;
-            });
-            
-            reportsList.innerHTML = html;
-            
-            // Add event listeners
-            document.querySelectorAll('.view-summary').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const card = e.target.closest('.report-card');
-                    const reportId = card.getAttribute('data-id');
-                    window.location.href = `/report/${reportId}`;
-                });
-            });
-            
-            // Search functionality
-            document.getElementById('searchBtn').addEventListener('click', filterReports);
-            document.getElementById('searchInput').addEventListener('keyup', filterReports);
-            
-        } catch (error) {
-            reportsList.innerHTML = `
-                <div class="error">
-                    <p>Error loading reports: ${error.message}</p>
-                    <button class="btn-primary" onclick="location.reload()">Try Again</button>
-                </div>
-            `;
-        }
-    });
-    
-    function filterReports() {
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-        const cards = document.querySelectorAll('.report-card');
-        
-        cards.forEach(card => {
-            const title = card.querySelector('h3').textContent.toLowerCase();
-            if(title.includes(searchTerm)) {
-                card.style.display = 'block';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-    }
-</script>
-{% endblock %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reports</title>
+    <link rel="icon" href="/static/favicon.ico">
+</head>
+<body>
+    <h1>Climate Reports</h1>
+    <!-- Report content here -->
+</body>
+</html>
