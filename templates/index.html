@@ -5,12 +5,26 @@
     <link rel="icon" href="/static/favicon.ico">
     <link rel="stylesheet" href="/static/styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        /* Add any additional styles here */
-    </style>
 </head>
 <body>
     <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+    
+    <div class="theme-toggle" id="theme-toggle">
+        <svg id="light-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 2V4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 20V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4.93 4.93L6.34 6.34" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M17.66 17.66L19.07 19.07" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 12H4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M20 12H22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6.34 17.66L4.93 19.07" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M19.07 4.93L17.66 6.34" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <svg id="dark-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
     
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -19,6 +33,14 @@
                     <path d="M12 4V20M4 12H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                 </svg>
                 New chat
+            </button>
+            <button class="ipcc-crawler-btn" onclick="startIPCCCrawler()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 19C15.866 19 19 15.866 19 12C19 8.13401 15.866 5 12 5C8.13401 5 5 8.13401 5 12C5 15.866 8.13401 19 12 19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 9V12L14.5 13.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16 5V3M19 6L17 4M21 12H19M19 19L17 17M12 21V19M7 17L5 19M3 12H5M7 7L5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                IPCC Crawler
             </button>
         </div>
         
@@ -34,7 +56,7 @@
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <span>Carbon Emissions</span>
+                    <span>IPCC Analysis</span>
                 </div>
             </div>
         </div>
@@ -49,7 +71,7 @@
             <!-- Welcome screen -->
             <div class="welcome-container" id="welcome-container">
                 <h1 class="welcome-title">ClimateSense AI Assistant</h1>
-                <p class="welcome-subtitle">Your AI-powered assistant for climate data analysis, environmental insights, and sustainability solutions.</p>
+                <p class="welcome-subtitle">Your AI-powered assistant for IPCC summaries, climate data analysis, and environmental insights.</p>
                 
                 <div class="features-grid">
                     <div class="feature-card">
@@ -87,12 +109,13 @@
                     <div class="feature-card">
                         <h3>
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#10a37f" stroke-width="2"/>
-                                <path d="M12 16V12M12 8H12.01" stroke="#10a37f" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3Z" stroke="#10a37f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M9 10C9.55228 10 10 9.55228 10 9C10 8.44772 9.55228 8 9 8C8.44772 8 8 8.44772 8 9C8 9.55228 8.44772 10 9 10Z" stroke="#10a37f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M19 14L14 9L5 18" stroke="#10a37f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
-                            Expert Advice
+                            IPCC Summarizer
                         </h3>
-                        <p>Get recommendations for sustainable practices and climate change mitigation strategies.</p>
+                        <p>Get concise summaries of IPCC reports and key findings on climate change.</p>
                     </div>
                 </div>
                 
@@ -100,7 +123,7 @@
                     <div class="input-area">
                         <textarea 
                             id="welcome-input" 
-                            placeholder="Ask about climate data, reports, or predictions..." 
+                            placeholder="Ask about IPCC reports, climate data, or predictions..." 
                             rows="1"
                         ></textarea>
                         <button onclick="sendMessageFromWelcome()">
@@ -110,7 +133,7 @@
                         </button>
                     </div>
                     <div class="input-footer">
-                        ClimateSense AI can make mistakes. Consider checking important information.
+                        IPCC data is sourced from official reports. ClimateSense AI can make mistakes.
                     </div>
                 </div>
             </div>
@@ -127,6 +150,13 @@
                     oninput="autoResize(this)"
                     onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
                 ></textarea>
+                <div class="ipcc-crawler-chat-btn" title="Run IPCC Crawler" onclick="startIPCCCrawler()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 19C15.866 19 19 15.866 19 12C19 8.13401 15.866 5 12 5C8.13401 5 5 8.13401 5 12C5 15.866 8.13401 19 12 19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 9V12L14.5 13.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M16 5V3M19 6L17 4M21 12H19M19 19L17 17M12 21V19M7 17L5 19M3 12H5M7 7L5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
                 <button id="send-button" onclick="sendMessage()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -134,7 +164,7 @@
                 </button>
             </div>
             <div class="input-footer">
-                ClimateSense AI can make mistakes. Consider checking important information.
+                IPCC data is sourced from official reports. ClimateSense AI can make mistakes.
             </div>
         </div>
     </div>
@@ -145,15 +175,40 @@
             document.getElementById('sidebar').classList.toggle('open');
         });
         
-        // Set welcome message timestamp
-        document.getElementById('welcome-time').textContent = getCurrentTime();
+        // Theme toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const lightIcon = document.getElementById('light-icon');
+        const darkIcon = document.getElementById('dark-icon');
+        
+        // Check for saved theme preference
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            lightIcon.style.display = 'none';
+            darkIcon.style.display = 'block';
+        } else {
+            lightIcon.style.display = 'block';
+            darkIcon.style.display = 'none';
+        }
+        
+        themeToggle.addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                lightIcon.style.display = 'none';
+                darkIcon.style.display = 'block';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                lightIcon.style.display = 'block';
+                darkIcon.style.display = 'none';
+                localStorage.setItem('theme', 'light');
+            }
+        });
         
         // Auto-resize textarea
         function autoResize(textarea) {
             textarea.style.height = 'auto';
             textarea.style.height = (textarea.scrollHeight) + 'px';
             
-            // Limit max height
             if (textarea.scrollHeight > 200) {
                 textarea.style.overflowY = 'auto';
             } else {
@@ -167,12 +222,6 @@
             container.scrollTop = container.scrollHeight;
         }
         
-        // Get formatted time
-        function getCurrentTime() {
-            const now = new Date();
-            return now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        }
-        
         // Add message to chat
         function addMessage(sender, text) {
             // Hide welcome screen if visible
@@ -183,7 +232,7 @@
             }
             
             const container = document.getElementById('chat-container');
-            const timestamp = getCurrentTime();
+            const timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}`;
@@ -211,7 +260,7 @@
             
             // Simulate AI response
             setTimeout(() => {
-                addMessage('ai', "Hello! I'm ClimateSense AI, your assistant for climate data analysis. How can I help you today?");
+                addMessage('ai', "Hello! I'm ClimateSense AI, your assistant for IPCC summaries and climate data analysis. How can I help you today?");
             }, 1000);
         }
         
@@ -256,6 +305,20 @@
                 input.disabled = false;
                 button.disabled = false;
                 input.focus();
+            }
+        }
+        
+        // Start IPCC crawler
+        async function startIPCCCrawler() {
+            try {
+                const response = await fetch('/crawl-ipcc', {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                addMessage('ai', `IPCC crawler started: ${result.status}. This may take a few minutes...`);
+            } catch (error) {
+                addMessage('ai', 'Failed to start IPCC crawler.');
+                console.error('Error:', error);
             }
         }
         
